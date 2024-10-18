@@ -8,12 +8,14 @@ from .logout import router as logout_router
 # from .tiers import router as tiers_router
 from .users import router as users_router
 from .rooms import router as rooms_router
+from .image import router as image_router
 
 router = APIRouter(prefix="/v1")
 router.include_router(login_router)
 router.include_router(logout_router)
 router.include_router(users_router)
 router.include_router(rooms_router)
+router.include_router(image_router)
 # router.include_router(posts_router)
 # router.include_router(tasks_router)
 # router.include_router(tiers_router)

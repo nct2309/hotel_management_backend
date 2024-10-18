@@ -96,7 +96,9 @@ class DefaultRateLimitSettings(BaseSettings):
     DEFAULT_RATE_LIMIT_LIMIT: int = config("DEFAULT_RATE_LIMIT_LIMIT", default=10)
     DEFAULT_RATE_LIMIT_PERIOD: int = config("DEFAULT_RATE_LIMIT_PERIOD", default=3600)
 
-
+class IMGBBSettings(BaseSettings):
+    IMGBB_API_KEY: str = config("IMGBB_API_KEY", default=None)
+    
 class EnvironmentOption(Enum):
     LOCAL = "local"
     STAGING = "staging"
@@ -119,6 +121,7 @@ class Settings(
     RedisRateLimiterSettings,
     DefaultRateLimitSettings,
     EnvironmentSettings,
+    IMGBBSettings,
 ):
     pass
 

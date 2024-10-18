@@ -3,24 +3,24 @@ from logging.config import fileConfig
 
 from alembic import context
 from app.core.config import settings
-from app.core.db.database import Base
+from app.models import Base
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import async_engine_from_config
+from sqlalchemy.ext.asyncio import create_async_engine
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-config.set_main_option(
-    "sqlalchemy.url",
-    f"{settings.POSTGRES_URI}",
-)
-
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
+
+config.set_main_option(
+    "sqlalchemy.url",
+    f"{settings.POSTGRES_URI}",
+)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
@@ -64,16 +64,15 @@ def do_run_migrations(connection: Connection) -> None:
 async def run_async_migrations() -> None:
     """In this scenario we need to create an Engine and associate a connection with the context."""
 
-    connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
+    connectable = create_async_engine(
+        f"{settings.POSTGRES_URI}",
         poolclass=pool.NullPool,
     )
 
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)
 
-    await connectable.dispose()
+    # await connectable.dispose()
 
 
 def run_migrations_online() -> None:
