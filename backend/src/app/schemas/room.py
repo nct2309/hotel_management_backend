@@ -10,8 +10,8 @@ class RoomBase(BaseModel):
     description: Annotated[str, Field(examples=["Experience luxury with a breathtaking view"])]
     image: Annotated[str, Field(examples=["/placeholder.svg?height=200&width=300"])]
     price: Annotated[float, Field(examples=[299])]
-    features: Annotated[list[str], Field(examples=[["King-size bed", "Up to 3 guests", "Free WiFi", "55\" 4K Smart TV", "Coffee machine"]])]
-    badges: Annotated[list[str], Field(examples=[["Ocean View", "Non-smoking", "Free Cancellation"]])]
+    feature_ids: Annotated[list[int], Field(examples=[[1, 2, 3]])]
+    badge_ids: Annotated[list[int], Field(examples=[[1, 2, 3]])]
 
 
 class Room(TimestampSchema, RoomBase, UUIDSchema, PersistentDeletion):
@@ -23,8 +23,12 @@ class RoomRead(BaseModel):
     description: str
     image: str
     price: float
-    features: list[str]
-    badges: list[str]
+    feature_ids: list[int]
+    badge_ids: list[int]
+
+class RoomReadExternal(RoomRead):
+    features: list[dict]
+    badges: list[dict]
     
 class RoomCreate(RoomBase):
     model_config = ConfigDict(extra="forbid")
@@ -36,8 +40,8 @@ class RoomUpdate(BaseModel):
     description: Annotated[str | None, Field(examples=["Experience luxury with a breathtaking view"], default=None)]
     image: Annotated[str | None, Field(examples=["/placeholder.svg?height=200&width=300"], default=None)]
     price: Annotated[float | None, Field(examples=[299], default=None)]
-    features: Annotated[list[str] | None, Field(examples=[["King-size bed", "Up to 3 guests", "Free WiFi", "55\" 4K Smart TV", "Coffee machine"]], default=None)]
-    badges: Annotated[list[str] | None, Field(examples=[["Ocean View", "Non-smoking", "Free Cancellation"]], default=None)]
+    feature_ids: Annotated[list[int] | None, Field(examples=[[1, 2, 3]], default=None)]
+    badge_ids: Annotated[list[int] | None, Field(examples=[[1, 2, 3]], default=None)]
 
 class RoomUpdateInternal(RoomUpdate):
     updated_at: datetime
@@ -47,3 +51,17 @@ class RoomDelete(BaseModel):
     
     is_deleted: bool
     deleted_at: datetime
+    
+class RoomFeatureBase(BaseModel):
+    name: Annotated[str, Field(examples=["King-size bed"])]
+    description: Annotated[str, Field(examples=["A large bed fit for a king"])]
+
+class RoomFeatureDetail(RoomFeatureBase):
+    id: int
+    
+class RoomBadgeBase(BaseModel):
+    name: Annotated[str, Field(examples=["Ocean View"])]
+    description: Annotated[str, Field(examples=["A room with a view of the ocean"])]
+    
+class RoomBadgeDetail(RoomBadgeBase):
+    id: int
