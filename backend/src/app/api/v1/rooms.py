@@ -1,6 +1,6 @@
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Query
 from fastcrud.paginated import PaginatedListResponse, compute_offset, paginated_response
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -175,7 +175,7 @@ async def read_room_badges(
     return badges
 
 # An API use to filter room in range of price and features and badges
-@router.post("/rooms/filter", response_model=PaginatedListResponse[RoomReadExternal])
+@router.get("/rooms/filter", response_model=PaginatedListResponse[RoomReadExternal])
 async def filter_rooms(
     request: Request,
     db: Annotated[AsyncSession, Depends(async_get_db)],
@@ -183,8 +183,10 @@ async def filter_rooms(
     items_per_page: int = 10,
     min_price: int = 0,
     max_price: int = 200,
-    feature_ids: list[int] = [],
-    badge_ids: list[int] = [],
+    # feature_ids: list[int] = [],
+    # badge_ids: list[int] = [],
+    feature_ids: list[int] = Query([]),
+    badge_ids: list[int] = Query([]),
 ) -> dict:
     rooms_data = await crud_rooms.get_multi(
         db=db,
