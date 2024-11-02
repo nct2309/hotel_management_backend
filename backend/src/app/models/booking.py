@@ -20,11 +20,17 @@ class Booking(Base):
     user: Optional[Mapped[User]] = relationship("User", lazy="selectin", init=False)
     room: Optional[Mapped[Room]] = relationship("Room", lazy="selectin", init=False)
     
+    # additional info about the booking
+    guest_name: Mapped[str] = mapped_column(String, nullable=False)
+    guest_email: Mapped[str] = mapped_column(String, nullable=False)
+    number_of_guests: Mapped[int] = mapped_column(Integer, nullable=False)
     total_price: Mapped[float] = mapped_column(Float, nullable=False)
+    
+    guest_contact_numbers: Mapped[List[str]] = mapped_column(ARRAY(String), nullable=False, default_factory=[])
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default_factory=lambda: datetime.now(UTC))
     updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
-    
+        
     # status can be pending, confirmed, cancelled or checked_out
     status: Mapped[str] = mapped_column(String, nullable=False, default="pending")
     

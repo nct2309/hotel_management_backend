@@ -10,6 +10,7 @@ class UserBase(BaseModel):
     name: Annotated[str, Field(min_length=2, max_length=30, examples=["User Userson"])]
     username: Annotated[str, Field(min_length=2, max_length=20, pattern=r"^[a-z0-9]+$", examples=["userson"])]
     email: Annotated[EmailStr, Field(examples=["user.userson@example.com"])]
+    phone_number: Annotated[str, Field(min_length=10, max_length=15, examples=["+1234567890"])]
 
 
 class User(TimestampSchema, UserBase, UUIDSchema, PersistentDeletion):
@@ -26,6 +27,7 @@ class UserRead(BaseModel):
     username: Annotated[str, Field(min_length=2, max_length=20, pattern=r"^[a-z0-9]+$", examples=["userson"])]
     email: Annotated[EmailStr, Field(examples=["user.userson@example.com"])]
     profile_image_url: str
+    phone_number: Annotated[str, Field(min_length=0, max_length=15, examples=["+1234567890"])]
     # tier_id: int | None
 
 
@@ -52,6 +54,10 @@ class UserUpdate(BaseModel):
         Field(
             pattern=r"^(https?|ftp)://[^\s/$.?#].[^\s]*$", examples=["https://www.profileimageurl.com"], default=None
         ),
+    ]
+    phone_number: Annotated[
+        str,
+        Field(min_length=0, max_length=15, examples=["+1234567890"], default=None)
     ]
 
 

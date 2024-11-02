@@ -8,7 +8,8 @@ from ..core.schemas import PersistentDeletion, TimestampSchema, UUIDSchema
 class RoomBase(BaseModel):
     name: Annotated[str, Field(examples=["Deluxe Ocean View Suite"])]
     description: Annotated[str, Field(examples=["Experience luxury with a breathtaking view"])]
-    image: Annotated[str, Field(examples=["/placeholder.svg?height=200&width=300"])]
+    image_2d: Annotated[str, Field(examples=["/placeholder.svg?height=200&width=300"])] = ""
+    image_3d: Annotated[str, Field(examples=["/placeholder.svg?height=200&width=300"])] = ""
     price: Annotated[float, Field(examples=[299])]
     feature_ids: Annotated[list[int], Field(examples=[[1, 2, 3]])]
     badge_ids: Annotated[list[int], Field(examples=[[1, 2, 3]])]
@@ -39,7 +40,8 @@ class RoomUpdate(BaseModel):
     
     name: Annotated[str | None, Field(examples=["Deluxe Ocean View Suite"], default=None)]
     description: Annotated[str | None, Field(examples=["Experience luxury with a breathtaking view"], default=None)]
-    image: Annotated[str | None, Field(examples=["/placeholder.svg?height=200&width=300"], default=None)]
+    image_2d: Annotated[str | None, Field(examples=["/placeholder.svg?height=200&width=300"], default=None)] = ""
+    image_3d: Annotated[str | None, Field(examples=["/placeholder.svg?height=200&width=300"], default=None)] = ""
     price: Annotated[float | None, Field(examples=[299], default=None)]
     feature_ids: Annotated[list[int] | None, Field(examples=[[1, 2, 3]], default=None)]
     badge_ids: Annotated[list[int] | None, Field(examples=[[1, 2, 3]], default=None)]
