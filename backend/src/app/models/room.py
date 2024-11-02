@@ -25,7 +25,8 @@ class Room(Base):
     name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     
     description: Mapped[str] = mapped_column(String, nullable=False)
-    image: Mapped[str] = mapped_column(String, nullable=False)
+    image_2d: Mapped[str] = mapped_column(String, nullable=False)
+    image_3d: Mapped[str] = mapped_column(String, nullable=True)
     price: Mapped[float] = mapped_column(Float, nullable=False)
     # features: Mapped[List[str]] = mapped_column(JSON, nullable=False)
     # badges: Mapped[List[str]] = mapped_column(JSON, nullable=False)

@@ -4,3 +4,4 @@
 from ..core.db.database import Base
 from .user import User
 from .room import Room, RoomFeature, RoomBadge
+from .booking import Booking
