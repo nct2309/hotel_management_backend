@@ -26,7 +26,7 @@ class Booking(Base):
     number_of_guests: Mapped[int] = mapped_column(Integer, nullable=False)
     total_price: Mapped[float] = mapped_column(Float, nullable=False)
     
-    guest_contact_numbers: Mapped[List[str]] = mapped_column(ARRAY(String), nullable=False, default_factory=[])
+    guest_contact_number: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default_factory=lambda: datetime.now(UTC))
     updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
