@@ -21,7 +21,8 @@ class RoomRead(BaseModel):
     id: int
     name: str
     description: str
-    image: str
+    image_2d: str = ""
+    image_3d: str = ""
     price: float
     feature_ids: list[int]
     badge_ids: list[int]
