@@ -196,6 +196,9 @@ def create_application(
             if settings.ENVIRONMENT != EnvironmentOption.LOCAL:
                 docs_router = APIRouter(dependencies=[Depends(get_current_superuser)])
 
+            @docs_router.get("/", include_in_schema=False)
+            async def get_swagger_documentation() -> fastapi.responses.HTMLResponse:
+                return get_swagger_ui_html(openapi_url="/openapi.json", title="docs")
             @docs_router.get("/docs", include_in_schema=False)
             async def get_swagger_documentation() -> fastapi.responses.HTMLResponse:
                 return get_swagger_ui_html(openapi_url="/openapi.json", title="docs")

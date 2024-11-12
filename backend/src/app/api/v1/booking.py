@@ -8,7 +8,9 @@ from ..dependencies import get_current_superuser
 from ...core.db.database import async_get_db
 from ...core.exceptions.http_exceptions import DuplicateValueException, NotFoundException
 from ...crud.crud_booking import crud_bookings
+from ...crud.crud_rooms import crud_rooms
 from ...schemas.booking import BookingCreate, BookingDelete, BookingRead, BookingUpdate, BookingUpdateInternal
+from ...schemas.room import RoomRead, RoomUpdate
 
 router = APIRouter(tags=["bookings"])
 
@@ -16,7 +18,24 @@ router = APIRouter(tags=["bookings"])
 async def write_booking(
     request: Request, booking: BookingCreate, db: Annotated[AsyncSession, Depends(async_get_db)]
 ) -> BookingRead:
+    """_summary_
+
+    Args:
+        request (Request): _description_
+        booking (BookingCreate): _description_
+        db (Annotated[AsyncSession, Depends): _description_
+
+    Returns:
+        BookingRead: _description_
+    Further details:
+    - If the booking status is confirmed, the room status will be updated to "booked".
+    """
     created_booking: BookingRead = await crud_bookings.create(db=db, object=booking)
+    
+    if created_booking.status == "confirmed":
+        # update room status to booked
+        updated_room: RoomRead = await crud_rooms.update(db=db, id=created_booking.room_id, object=RoomUpdate(status="booked", from_date=created_booking.check_in, to_date=created_booking.check_out))
+
     return created_booking
 
 @router.get("/bookings", response_model=PaginatedListResponse[BookingRead])
@@ -76,3 +95,49 @@ async def read_user_bookings(
 
     response: dict[str, Any] = paginated_response(crud_data=bookings_data, page=page, items_per_page=items_per_page)
     return response
+
+@router.post("/booking/{id}/cancel")
+async def cancel_booking(
+    request: Request, id: int, db: Annotated[AsyncSession, Depends(async_get_db)]
+):
+    """_summary_
+
+    Args:
+        request (Request): _description_
+        id (int): _description_
+        db (Annotated[AsyncSession, Depends): _description_
+
+    Raises:
+        NotFoundException: _description_
+
+    Returns:
+        _type_: _description_
+    Further details:
+    - If the booking status is cancelled, the room status will be updated to "available".
+    - If the booking status is pending or confirmed, the booking status will be updated to "cancelled".
+    - If the booking status is checked_out, the booking status will not be updated.
+    
+    """
+    booking: BookingRead = await crud_bookings.get(db=db, schema_to_select=BookingRead, id=id, is_deleted=False)
+    if booking is None:
+        raise NotFoundException("Booking not found")
+    
+    if booking.get("status") == "cancelled":
+        return {
+            "message": "Booking already cancelled"
+        }
+        
+    if booking.get("status") == "pending" or booking.get("status") == "confirmed":
+        updated_booking: BookingRead = await crud_bookings.update(db=db, id=id, object=BookingUpdate(status="cancelled"))
+        
+        # update room status to available
+        updated_room: RoomRead = await crud_rooms.update(db=db, id=booking.get("room_id"), object=RoomUpdate(status="available", from_date=None, to_date=None))
+        
+        return {
+            "message": "Booking cancelled successfully"
+        }
+        
+    # booking status is checked_out    
+    return {
+        "message": "Booking already checked out"
+    }

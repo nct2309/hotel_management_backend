@@ -46,7 +46,7 @@ class BookingUpdate(BaseModel):
     status: Annotated[str | None, Field(examples=["pending"], default=None)]
     
     guest_name: Annotated[str | None, Field(examples=["John Doe"], default=None)]
-    guest_contact_number: Annotated[str, Field(examples=["+1234567890"])]
+    guest_contact_number: Annotated[str, Field(examples=["+1234567890"], default=None)]
     guest_email: Annotated[str | None, Field(examples=["abc@gmail.com"], default=None)]
     number_of_guests: Annotated[int | None, Field(examples=[1], default=None)]
     

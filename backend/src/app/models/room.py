@@ -31,6 +31,12 @@ class Room(Base):
     # features: Mapped[List[str]] = mapped_column(JSON, nullable=False)
     # badges: Mapped[List[str]] = mapped_column(JSON, nullable=False)
     # features and badges are many-to-many relationships with the Feature and Badge tables and they are nullable
+    
+    from_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True, default=None)
+    to_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True, default=None)
+    status: Mapped[str] = mapped_column(String, nullable=False, default="available") # status can be available, booked, under_maintenance, reserved, unavailable
+
+    
     feature_ids: Mapped[List[int]] = mapped_column(ARRAY(Integer), nullable=True, default_factory=[])
     badge_ids: Mapped[List[int]] = mapped_column(ARRAY(Integer), nullable=True, default_factory=[])
     
