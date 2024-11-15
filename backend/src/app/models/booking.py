@@ -31,6 +31,6 @@ class Booking(Base):
     updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
         
-    # status can be pending, confirmed, cancelled or checked_out
-    status: Mapped[str] = mapped_column(String, nullable=False, default="pending")
+    # status can be booked, cancelled or checked_out
+    status: Mapped[str] = mapped_column(String, nullable=False, default="booked")
     

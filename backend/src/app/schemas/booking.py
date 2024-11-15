@@ -11,7 +11,7 @@ class BookingBase(BaseModel):
     check_in: Annotated[datetime, Field(examples=["2022-01-01T12:00:00Z"])]
     check_out: Annotated[datetime, Field(examples=["2022-01-02T12:00:00Z"])]
     total_price: Annotated[float, Field(examples=[299])]
-    status: Annotated[str, Field(examples=["pending"])]
+    status: Annotated[str, Field(examples=["booked"])]
     
     guest_name: Annotated[str, Field(examples=["John Doe"])]
     guest_contact_number: Annotated[str, Field(examples=["+1234567890"])]
@@ -43,7 +43,7 @@ class BookingUpdate(BaseModel):
     check_in: Annotated[datetime | None, Field(examples=["2022-01-01T12:00:00Z"], default=None)]
     check_out: Annotated[datetime | None, Field(examples=["2022-01-02T12:00:00Z"], default=None)]
     total_price: Annotated[float | None, Field(examples=[299], default=None)]
-    status: Annotated[str | None, Field(examples=["pending"], default=None)]
+    status: Annotated[str | None, Field(examples=["booked"], default=None)]
     
     guest_name: Annotated[str | None, Field(examples=["John Doe"], default=None)]
     guest_contact_number: Annotated[str, Field(examples=["+1234567890"], default=None)]

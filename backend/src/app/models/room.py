@@ -34,7 +34,7 @@ class Room(Base):
     
     from_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True, default=None)
     to_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True, default=None)
-    status: Mapped[str] = mapped_column(String, nullable=False, default="available") # status can be available, booked, under_maintenance, reserved, unavailable
+    status: Mapped[str] = mapped_column(String, nullable=False, default="available") # status can be available, booked, under_maintenance, unavailable
 
     
     feature_ids: Mapped[List[int]] = mapped_column(ARRAY(Integer), nullable=True, default_factory=[])

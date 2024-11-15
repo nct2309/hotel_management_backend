@@ -28,11 +28,11 @@ async def write_booking(
     Returns:
         BookingRead: _description_
     Further details:
-    - If the booking status is confirmed, the room status will be updated to "booked".
+    - If the booking status is booked, the room status will be updated to "booked".
     """
     created_booking: BookingRead = await crud_bookings.create(db=db, object=booking)
     
-    if created_booking.status == "confirmed":
+    if created_booking.status == "booked":
         # update room status to booked
         updated_room: RoomRead = await crud_rooms.update(db=db, id=created_booking.room_id, object=RoomUpdate(status="booked", from_date=created_booking.check_in, to_date=created_booking.check_out))
 
@@ -67,7 +67,24 @@ async def read_booking(request: Request, id: int, db: Annotated[AsyncSession, De
 async def update_booking(
     request: Request, id: int, booking: BookingUpdate, db: Annotated[AsyncSession, Depends(async_get_db)]
 ) -> dict:
+    """_summary_
+
+    Args:
+        request (Request): _description_
+        id (int): _description_
+        booking (BookingUpdate): _description_
+        db (Annotated[AsyncSession, Depends): _description_
+
+    Returns:
+        dict: _description_
+    Further details:
+        - If the booking status is booked, the room status will be updated to "booked".
+    """
     updated_booking: BookingRead = await crud_bookings.update(db=db, id=id, object=booking)
+    print(updated_booking)
+    if booking.status == "booked":
+        # update room status to booked
+        updated_room: RoomRead = await crud_rooms.update(db=db, id=booking.room_id, object=RoomUpdate(status="booked", from_date=booking.check_in, to_date=booking.check_out))
     return {"message": "Booking updated successfully"}
 
 @router.delete("/booking/{id}", response_model=dict)
@@ -114,7 +131,7 @@ async def cancel_booking(
         _type_: _description_
     Further details:
     - If the booking status is cancelled, the room status will be updated to "available".
-    - If the booking status is pending or confirmed, the booking status will be updated to "cancelled".
+    - If the booking status is booked, the booking status will be updated to "cancelled".
     - If the booking status is checked_out, the booking status will not be updated.
     
     """
@@ -127,7 +144,7 @@ async def cancel_booking(
             "message": "Booking already cancelled"
         }
         
-    if booking.get("status") == "pending" or booking.get("status") == "confirmed":
+    if booking.get("status") == "booked":
         updated_booking: BookingRead = await crud_bookings.update(db=db, id=id, object=BookingUpdate(status="cancelled"))
         
         # update room status to available
