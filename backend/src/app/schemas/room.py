@@ -35,8 +35,8 @@ class RoomRead(BaseModel):
     feature_ids: list[int]
     badge_ids: list[int]
     status: str
-    from_date: datetime
-    to_date: datetime
+    from_date: datetime | None
+    to_date: datetime | None
 
 class RoomReadExternal(RoomRead):
     features: list[dict]
