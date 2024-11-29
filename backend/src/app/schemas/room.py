@@ -17,9 +17,9 @@ class RoomBase(BaseModel):
     price: Annotated[float, Field(examples=[299])]
     feature_ids: Annotated[list[int], Field(examples=[[1, 2, 3]])]
     badge_ids: Annotated[list[int], Field(examples=[[1, 2, 3]])]
-    status: Annotated[str, Field(examples=["available"], default="available")]
-    from_date: Annotated[datetime | None, Field(examples=["2022-01-01T00:00:00"], default=None)]
-    to_date: Annotated[datetime | None, Field(examples=["2022-01-01T00:00:00"], default=None)]
+    # status: Annotated[str, Field(examples=["available"], default="available")]
+    # from_date: Annotated[datetime | None, Field(examples=["2022-01-01T00:00:00"], default=None)]
+    # to_date: Annotated[datetime | None, Field(examples=["2022-01-01T00:00:00"], default=None)]
 
 
 class Room(TimestampSchema, RoomBase, UUIDSchema, PersistentDeletion):
@@ -34,9 +34,9 @@ class RoomRead(BaseModel):
     price: float
     feature_ids: list[int]
     badge_ids: list[int]
-    status: str
-    from_date: datetime | None
-    to_date: datetime | None
+    # status: str
+    # from_date: datetime | None
+    # to_date: datetime | None
 
 class RoomReadExternal(RoomRead):
     features: list[dict]
@@ -55,9 +55,9 @@ class RoomUpdate(BaseModel):
     price: Annotated[float | None, Field(examples=[299], default=None)]
     feature_ids: Annotated[list[int] | None, Field(examples=[[1, 2, 3]], default=None)]
     badge_ids: Annotated[list[int] | None, Field(examples=[[1, 2, 3]], default=None)]
-    status: Annotated[str | None, Field(examples=["available"], default=None)]
-    from_date: Annotated[datetime | None, Field(examples=["2022-01-01T00:00:00"], default=None)]
-    to_date: Annotated[datetime | None, Field(examples=["2022-01-01T00:00:00"], default=None)]
+    # status: Annotated[str | None, Field(examples=["available"], default=None)]
+    # from_date: Annotated[datetime | None, Field(examples=["2022-01-01T00:00:00"], default=None)]
+    # to_date: Annotated[datetime | None, Field(examples=["2022-01-01T00:00:00"], default=None)]
 
 class RoomUpdateInternal(RoomUpdate):
     updated_at: datetime

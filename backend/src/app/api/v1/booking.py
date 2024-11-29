@@ -27,15 +27,17 @@ async def write_booking(
 
     Returns:
         BookingRead: _description_
-    Further details:
-    - If the booking status is booked, the room status will be updated to "booked".
     """
+    # check if the check_in date is before the check_out date
+    if booking.check_in >= booking.check_out:
+        raise ValueError("Check-in date should be before the check-out date")
+    # check if there is already a booking for the room in the given date range
+    existing_booking = await crud_bookings.exists(db=db, room_id=booking.room_id, check_in__lte=booking.check_out, check_out__gte=booking.check_in)
+    if existing_booking is not None:
+        raise DuplicateValueException("Room is already booked in the given date range")
+    
     created_booking: BookingRead = await crud_bookings.create(db=db, object=booking)
     
-    if created_booking.status == "booked":
-        # update room status to booked
-        updated_room: RoomRead = await crud_rooms.update(db=db, id=created_booking.room_id, object=RoomUpdate(status="booked", from_date=created_booking.check_in, to_date=created_booking.check_out))
-
     return created_booking
 
 @router.get("/bookings", response_model=PaginatedListResponse[BookingRead])
@@ -77,14 +79,17 @@ async def update_booking(
 
     Returns:
         dict: _description_
-    Further details:
-        - If the booking status is booked, the room status will be updated to "booked".
     """
+    # check if check_in date is before check_out date
+    if booking.check_in >= booking.check_out:
+        raise ValueError("Check-in date should be before the check-out date")
+    # check if there is already a booking for the room in the given date range
+    existing_booking = await crud_bookings.exists(db=db, room_id=booking.room_id, check_in__lte=booking.check_out, check_out__gte=booking.check_in)
+    if existing_booking is not None:
+        raise DuplicateValueException("Room is already booked in the given date range")
+    
     updated_booking: BookingRead = await crud_bookings.update(db=db, id=id, object=booking)
-    print(updated_booking)
-    if booking.status == "booked":
-        # update room status to booked
-        updated_room: RoomRead = await crud_rooms.update(db=db, id=booking.room_id, object=RoomUpdate(status="booked", from_date=booking.check_in, to_date=booking.check_out))
+
     return {"message": "Booking updated successfully"}
 
 @router.delete("/booking/{id}", response_model=dict)
@@ -129,8 +134,8 @@ async def cancel_booking(
 
     Returns:
         _type_: _description_
+        
     Further details:
-    - If the booking status is cancelled, the room status will be updated to "available".
     - If the booking status is booked, the booking status will be updated to "cancelled".
     - If the booking status is checked_out, the booking status will not be updated.
     
@@ -147,9 +152,6 @@ async def cancel_booking(
     if booking.get("status") == "booked":
         updated_booking: BookingRead = await crud_bookings.update(db=db, id=id, object=BookingUpdate(status="cancelled"))
         
-        # update room status to available
-        updated_room: RoomRead = await crud_rooms.update(db=db, id=booking.get("room_id"), object=RoomUpdate(status="available", from_date=None, to_date=None))
-        
         return {
             "message": "Booking cancelled successfully"
         }
@@ -158,3 +160,45 @@ async def cancel_booking(
     return {
         "message": "Booking already checked out"
     }
+
+from datetime import datetime, timedelta, date
+@router.get("/room/{room_id}/bookings", response_model=PaginatedListResponse[BookingRead])
+async def read_room_bookings(
+    request: Request, room_id: int, db: Annotated[AsyncSession, Depends(async_get_db)], page: int = 1, items_per_page: int = 10,
+    status: str = Query("booked", alias="status"),
+    start_date: datetime = Query(date.today() - timedelta(days=30), alias="start_date"),
+    end_date: datetime = Query(date.today() + timedelta(days=30), alias="end_date")
+) -> dict:
+    """_summary_
+    Args:
+        request (Request): _description_
+        room_id (int): _description_
+        db (Annotated[AsyncSession, Depends): _description_
+        page (int, optional): _description_. Defaults to 1.
+        items_per_page (int, optional): _description_. Defaults to 10.
+        start_date (datetime, optional): _description_. Defaults to 1 month ago (from today).
+        end_date (datetime, optional): _description_. Defaults to 1 month later (from today).
+
+    Returns:
+        dict: _description_
+        
+    Further details:
+    - Get all bookings of a room with given status within a date range (check by check_out date).
+    """
+    
+    bookings_data = await crud_bookings.get_multi(
+        db=db,
+        offset=compute_offset(page, items_per_page),
+        limit=items_per_page,
+        schema_to_select=BookingRead,
+        is_deleted=False,
+        room_id=room_id,
+        sort_columns=["check_out"],
+        sort_order="asc",
+        status=status,
+        check_out__gte=start_date,
+        check_out__lte=end_date
+    )
+
+    response: dict[str, Any] = paginated_response(crud_data=bookings_data, page=page, items_per_page=items_per_page)
+    return response
