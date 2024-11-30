@@ -31,9 +31,9 @@ async def write_booking(
     # check if the check_in date is before the check_out date
     if booking.check_in >= booking.check_out:
         raise ValueError("Check-in date should be before the check-out date")
-    # check if there is already a booking for the room in the given date range
-    existing_booking = await crud_bookings.exists(db=db, room_id=booking.room_id, check_in__lte=booking.check_out, check_out__gte=booking.check_in)
-    if existing_booking is not None:
+    # check if there is already a booking for the room in the given date range(status = booked)
+    existing_booking = await crud_bookings.exists(db=db, room_id=booking.room_id, check_in__lte=booking.check_out, check_out__gte=booking.check_in, status="booked")
+    if existing_booking is not False:
         raise DuplicateValueException("Room is already booked in the given date range")
     
     created_booking: BookingRead = await crud_bookings.create(db=db, object=booking)
@@ -83,9 +83,9 @@ async def update_booking(
     # check if check_in date is before check_out date
     if booking.check_in >= booking.check_out:
         raise ValueError("Check-in date should be before the check-out date")
-    # check if there is already a booking for the room in the given date range
-    existing_booking = await crud_bookings.exists(db=db, room_id=booking.room_id, check_in__lte=booking.check_out, check_out__gte=booking.check_in)
-    if existing_booking is not None:
+    # check if there is already a booking for the room in the given date range (status = booked)
+    existing_booking = await crud_bookings.exists(db=db, room_id=booking.room_id, check_in__lte=booking.check_out, check_out__gte=booking.check_in, status="booked")
+    if existing_booking is not False:
         raise DuplicateValueException("Room is already booked in the given date range")
     
     updated_booking: BookingRead = await crud_bookings.update(db=db, id=id, object=booking)
